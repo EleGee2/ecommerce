@@ -42,8 +42,9 @@
             </div>
             <br>
             <div class="box-element hidden" id="payment-info">
-                <small>Flutterwave Options</small>
-                <button id="make-payment">Make Payment</button>
+                <small>Paypal Options</small>
+{#                <button id="make-payment">Make Payment</button>#}
+                <div id="paypal-button-container"></div>
             </div>
         </div>
 
@@ -66,6 +67,37 @@
             </div>
         </div>
     </div>
+
+    <script src="https://www.paypal.com/sdk/js?client-id=Ad7qDmeL_1gQ8Kx5sM3A6JZiApwWvINwCj3mI-WC8DOGLLnAIZAC68XILpm0iCPTBGakXA0LdmU3vD7J&currency=USD"></script>
+
+    <script>
+
+        const _total = '{{ order.get_cart_total }}'
+        paypal.Buttons({
+
+            style: {
+                color: 'blue',
+                shape: 'rect'
+            },
+          // Sets up the transaction when a payment button is clicked
+          createOrder: (data, actions) => {
+            return actions.order.create({
+              purchase_units: [{
+                amount: {
+                  value: parseFloat(_total).toFixed(2) // Can also reference a variable or function
+                }
+              }]
+            });
+          },
+          // Finalize the transaction after payer approval
+          onApprove: (data, actions) => {
+            return actions.order.capture().then(function(orderData) {
+              // Successful capture! For dev/demo purposes:
+                submitFormData()
+            });
+          }
+        }).render('#paypal-button-container');
+  </script>
 
     <script type="text/javascript">
         const shipping = "{{ order.shipping }}"
@@ -93,9 +125,11 @@
             document.getElementById("form-button").classList.add("hidden")
             document.getElementById("payment-info").classList.remove("hidden")
         })
+        /*
         document.getElementById("make-payment").addEventListener("click", (e) => {
             submitFormData()
         })
+         */
         function submitFormData() {
             console.log("Payment button clicked")
 
@@ -136,6 +170,8 @@
                 .then((data) => {
                     console.log("Success", data)
                     alert("Transaction completed")
+                    cart = {}
+                    document.cookie = 'cart=' + JSON.stringify(cart) + ";domain=;path=/";
                     window.location.href = "{% url 'store' %}"
                 })
         }
