@@ -7,7 +7,7 @@ from django.core.management.base import BaseCommand
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '../ecommerce/../../.env'))
+environ.Env.read_env(os.path.join(BASE_DIR, '../../ecommerce/.env'))
 class Command(BaseCommand):
     help = 'Creates a superuser.'
 
